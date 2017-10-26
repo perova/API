@@ -1,3 +1,21 @@
+<?php
+session_start();
+
+if(isset($_SESSION['name'])) {
+
+//login
+	//header("Location: index.php");
+
+}else{
+//guest
+	header("Location: login.php");
+
+}
+
+?>
+
+
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -10,32 +28,35 @@
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 	<div class="container-fluid">
+		<div class="row"><div class="col-md-12"><h1>Regitra</h1></div></div>
 		<div id="header" class="row">
-			<h1>Regitra</h1>
+			<div class="col-md-8"></div>
+			<div class="col-md-4"><a href="logout.php">Logout</a></div>
 		</div>
 	</div>
 	<div class="container">
 		<div class="row">
 			<div class="col-md-8">
 				<h2>Cars</h2>
-                <div class="form-row">
-                    <div class="col">
-                        Filters: 
-                    </div>
-                    <div class="col">
-                        <input class="form-control form-control-sm" type="text" id="search" placeholder="Search">
-                    </div>
-                    <div class="col">
-                        <input class="btn btn-sm btn-dark" type="button" id="last5" value="Last 5">
-                    </div>
-                    <div class="col">
-                        <select class="form-control form-control-sm" id="filter">
-                            <option value="bmw">BMW</option>
-                        </select>
-                    </div>                    
-                </div>
+				<div class="form-row">
+					<div class="col">
+						Filters: 
+					</div>
+					<div class="col">
+						<input class="form-control form-control-sm" type="text" id="search" placeholder="Search">
+					</div>
+					<div class="col">
+						<input class="btn btn-sm btn-dark" type="button" id="last5" value="Last 5">
+					</div>
+					<div class="col">
+						<select class="form-control form-control-sm" id="filter">
+							<option value="bmw">BMW</option>
+						</select>
+					</div>                    
+				</div>
 				<table class="table table-sm">
 					<thead>
 						<th>Id</th><th>Owner</th><th>Make</th><th>Model</th><th>License</th><th>Date</th>
@@ -62,9 +83,15 @@
 				<div class="input-group">
 					<input id="add" class="btn btn-warning btn-sm" type="button" value="Add">
 				</div>
+				<div>Upload file</div>
+				<form action="upload.php" method="post" enctype="multipart/form-data">
+					<input class="form-control form-control-sm" type="file" name="fileToUpload" id="fileToUpload" />
+					<button type="submit" class="btn btn-warning btn-sm" name="submit">Upload</button>
+				</form>
 			</div>
 		</div>
 	</div>
+</div>
 <script src="app.js"></script>
 </body>
 </html>

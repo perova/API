@@ -1,0 +1,22 @@
+a:link, a:visited {
+    background-color: #f44336;
+    color: white;
+    padding: 14px 25px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}
+h1{
+	text-align: center;
+}
+
+form {
+	text-align: center;
+	background-color: silver;
+	padding: 10px;
+
+}
+
+input{
+	margin-top: 5px;
+}
