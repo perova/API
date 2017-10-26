@@ -1,105 +1,131 @@
-<!--
-    author   : pradeep khodke
-    url      : http://www.codingcage.com
-    facebook : http://facebook.com/CodingCage
-    twitter  : http://twitter.com/CodingCage
-    twitter  : http://twitter.com/PradeepKhodke
-    Google+  : http://plus.googe.com/+PradeepKhodked
--->
+<?php
+session_start();
+
+
+if (isset($_POST['register'])) {
+
+    $servername = "localhost";
+    $username = "root";
+    $password = "";
+
+    try {
+        $conn = new PDO("mysql:host=$servername;dbname=regitra", $username, $password);
+        // set the PDO error mode to exception
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        if ($_POST['register_password'] == $_POST['repeat_password']
+            && $_POST['register_password'] != "" && $_POST['repeat_password'] != ""
+        ) {
+            $statement = $conn->prepare("INSERT INTO users (username, password)
+        VALUES (:username, :password)");
+
+            $password = password_hash($_POST['register_password'], PASSWORD_DEFAULT);
+            $statement->bindParam(':username', $_POST['register_username']);
+            $statement->bindParam(':password', $password);
+            $statement->execute();
+            $smg = '<div class="alert alert-success"> User created! </div>';
+            header("Location: login.php");
+        } else {
+            $smg = '<div class="alert alert-danger"> Passwords does not match </div>';
+        }
+
+    } catch (PDOException $e) {
+        echo "Connection failed: " . $e->getMessage();
+    }
+
+}
+
+
+//print_r($_SESSION);
+//print_r($_POST);
+?>
 <!DOCTYPE html>
 <html>
 <head>
-<title>Regitra</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" type="text/css" />
-<link rel="stylesheet" href="assets/signup-form.css" type="text/css" />
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <title></title>
 </head>
-
 <body>
 
-  <div class="container">
-
-    <div class="signup-form-container">
-    
-         <!-- form start -->
-         <form method="post" role="form" id="register-form" autocomplete="on">
-         
-         <div class="form-header">
-          <h3 class="form-title"><i class="fa fa-user"></i><span class="glyphicon glyphicon-user"></span> Sign Up</h3>
-                      
-         <div class="pull-right">
-             <h3 class="form-title"><span class="glyphicon glyphicon-pencil"></span></h3>
-         </div>
-                      
-         </div>
-                  
-         <div class="form-body">
-         
-            <!-- json response will be here -->
-              <div id="errorDiv"></div>
-              <!-- json response will be here -->
-                      
-            <div class="form-group">
-                   <div class="input-group">
-                   <div class="input-group-addon"><span class="glyphicon glyphicon-user"></span></div>
-                   <input name="name" type="text" id="name" class="form-control" placeholder="Name" maxlength="40" autofocus="true">
-                   </div>
-                   <span class="help-block" id="error"></span>
-              </div>
-                        
-              <div class="form-group">
-                   <div class="input-group">
-                   <div class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></div>
-                   <input name="email" id="email" type="text" class="form-control" placeholder="Email" maxlength="50">
-                   </div> 
-                   <span class="help-block" id="error"></span>                     
-              </div>
-                        
-              <div class="row">
-                        
-                   <div class="form-group col-lg-6">
-                        <div class="input-group">
-                        <div class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></div>
-                        <input name="password" id="password" type="password" class="form-control" placeholder="Password">
-                        </div>  
-                        <span class="help-block" id="error"></span>                    
-                   </div>
-                            
-                   <div class="form-group col-lg-6">
-                        <div class="input-group">
-                        <div class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></div>
-                        <input name="password" type="password" class="form-control" placeholder="Retype Password">
-                        </div>  
-                        <span class="help-block" id="error"></span>                    
-                   </div>
-                            
-             </div>
-                        
-                        
-            </div>
-            
-            <div class="form-footer">
-                 <button type="submit" class="btn btn-info" id="btn-signup">
-                 <span class="glyphicon glyphicon-log-in"></span> Sign Me Up
-                 </button>
-            </div>
-
-
+<div class="container">
+    <div class="row pt-5">
+        <div class="col"></div>
+        <div class="col">
+            <div id="register_alert"></div>
+            <form action="" method="POST">
+                <input class="form-control" type="text" id="register_username" name="register_username"
+                       placeholder="username">
+                <input id="password" class="form-control" type="password" name="register_password"
+                       placeholder="password">
+                <input id="password_repeat" class="form-control" type="password" name="repeat_password"
+                       placeholder="repeat password">
+                <input id="register_btn" class="btn btn-success btn-block form-group" name="register" type="submit"
+                       value="register" disabled>
             </form>
-            <a href="login.php">Login</a>
-           </div>
-           
-           <div class="alert alert-info">
-           <a href="http://www.codingcage.com/2016/05/ajax-bootstrap-signup-form-with-jquery.html" target="_blank"></a>
-           </div>
+            <div id="password_alert"></div>
+        </div>
+        <div class="col"></div>
+    </div>
+</div>
+<script>
+    password = document.getElementById('password');
+    password_repeat = document.getElementById('password_repeat');
+    alert = document.getElementById('password_alert');
+    register_btn = document.getElementById('register_btn');
 
-  </div>
-    
-    <script src="assets/jquery-1.12.4-jquery.min.js"></script>
-    <script src="bootstrap/js/bootstrap.min.js"></script>
-    <script src="assets/jquery.validate.min.js"></script>
-    <script src="assets/register.js"></script>
-   
+    password_repeat.addEventListener("keyup", check_form);
+    password.addEventListener("keyup", check_form);
+    $("#register_username").keyup(check_form);
+
+
+    function check_form() {
+        register_btn.disabled = false;
+        $.get("register_submit.php",
+            {
+                check_username: $("#register_username").val()
+            }, function (result) {
+                if (result != "") {
+                    $("#register_alert").html('');
+                    $("#register_alert").append('<div class="alert alert-danger"> Username Taken </div>');
+                    $("#register_btn").prop("disabled", true);
+                } else {
+                    $("#register_alert").html('');
+                    $("#register_alert").append('<div class="alert alert-success"> Username Available </div>');
+
+                }
+
+
+            });
+
+        if (password.value != password_repeat.value || password.value == "") {
+            alert.innerHTML = '<div class="alert alert-danger">Passwords does not match </div>';
+            register_btn.disabled = true;
+        }
+        else if (password.value == password_repeat.value) {
+            alert.innerHTML = '<div class="alert alert-success">Passwords match </div>';
+            //register_btn.disabled = false;
+
+
+        }
+
+    }
+    /*    function check_password_repeat(result){
+     if (password_repeat.value != password.value) {
+     alert.innerHTML = '<div class="alert alert-danger">Passwords does not match </div>';
+     register_btn.disabled = true;
+     check_username(result);
+     }
+     else if(password_repeat.value == password.value)
+     {
+     alert.innerHTML = '<div class="alert alert-success">Passwords match </div>';
+     register_btn.disabled = false;
+     check_username(result);
+     }
+     }*/
+
+
+</script>
 </body>
 </html>

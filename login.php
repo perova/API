@@ -1,77 +1,73 @@
+<?php
+session_start();
 
+if (isset($_POST['username'])) {
 
-<pre style="background-color:gray;padding:10px;">
-	<?php
-	session_start();
+    $servername = "localhost";
+    $username = "root";
+    $password = "";
 
-	if(isset($_POST['name'])) {
-
-		try {
-
-			$conn = new PDO("mysql:host=localhost;dbname=regitra;charset=utf8", "root", "");
+    try {
+        $conn = new PDO("mysql:host=$servername;dbname=regitra", $username, $password);
         // set the PDO error mode to exception
-			$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $statement = $conn->prepare("SELECT * FROM users WHERE username = :username");
+        $statement->bindParam(':username', $_POST['username']);
+        $statement->execute();
+        $userdata = $statement->fetch(PDO::FETCH_ASSOC);
 
-			$statement = $conn->prepare("SELECT * FROM users WHERE name = :name");
-			$statement->bindParam(':name', $_POST['name']);
-			$statement->execute();
+        if (password_verify($_POST['password'], $userdata['password'])) {
+            $_SESSION['username'] = $_POST['username'];
+            $_SESSION['level'] = $userdata['level'];
+            $_SESSION['last_login'] = date("Y-n-d H:m:s");
+            setcookie("sausainis_username", $userdata['username'], time() + (86400 * 7), "/"); // 86400 = 1 day
+            header("Location: index.php");
+        } else {
+            echo "Try again";
+        }
 
-			$user_data = $statement->fetch(PDO::FETCH_ASSOC);
-
-			} catch(PDOException $e) {
-				echo $e->getMessage();
-			}
-
-    //print_r($user_data);
-
-		if($user_data['password'] == $_POST['password'] && $_POST['password'] != "") {
-        $_SESSION['name'] = $_POST['name'];
-        $_SESSION['admin'] = true;
-        $_SESSION['last_login'] = date("Y-m-d H:m:s");
-        setcookie("sausainis_username", $user_pass["name"], time() + (60 * 60 *24), "/"); // 86400 = 1 day
-        header("Location: index.php");
-    } else {
-    	echo "Try again.<br>";
+    } catch (PDOException $e) {
+        echo "Connection failed: " . $e->getMessage();
     }
 
 }
+
+
 //print_r($_SESSION);
-
-if (isset($_COOKIE["sausainis_username"])) {
-	echo "Labas " . $_COOKIE["sausainis_username"];
-}
+//print_r($_POST);
 ?>
-</pre>
+
+<!DOCTYPE html>
 <html>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css">
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" type="text/css" href="style.css">
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <title></title>
+</head>
 <body>
-	<div class="container">
-		<div class="row">
-			<div class="col-md-6">
-				<h1>Login</h1>
-				<form method="POST">
-					<input class="form-control" type="text" name="name" placeholder="Username"><br>
-					<input class="form-control" type="password" name="password" placeholder="Password">
-					<input class="btn btn-success" type="submit" value="Login">
 
-				</form>
-				<a href="register.php">Register</a>
-			</div>
-		</div>
-	</div>
+<div class="container">
+    <div class="row pt-5">
+        <div class="col"></div>
+        <div class="col">
+            <?php
+            if (isset($_COOKIE["sausainis_username"])) {
+                echo 'Labas, ' . $_COOKIE["sausainis_username"] . '';
+            } else
 
+            ?>
 
-      <!--   <?php 
-        // if(isset($_SESSION['admin']) && $_SESSION['admin']) {
-        //     echo "You are admin!!!!";
-        // }elseif (isset($_SESSION["level"]) && $_SESSION['level'] = 0) {
-        //     header("Location:index.php");
-        // } else{
-        //     echo "You are guest.Please login.";
-        // }
-      ?> -->
-  </body>
-  </html>
+            <form action="" method="POST">
+                <input class="form-control" type="text" name="username" placeholder="username">
+                <input class="form-control" type="password" name="password" placeholder="password">
+                <input class="btn btn-success btn-block form-group" type="submit" value="login">
+            </form>
+            <a class="btn btn-block btn-warning" href="register.php">Register</a>
+
+        </div>
+        <div class="col"></div>
+    </div>
+</div>
+
+</body>
+</html>
